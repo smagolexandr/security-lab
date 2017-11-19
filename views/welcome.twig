@@ -1,0 +1,64 @@
+{% extends "base.twig" %}
+
+{% block content %}
+	<form method="post" class="form-signin">
+		<h2>Generate password</h2>
+		<label for="inputEmail" class="sr-only">Password</label>
+		<input type="text" id="password" name="password" placeholder="Пароль" class="form-control" required autofocus>
+		<label for="inputPassword" class="sr-only">Cost</label>
+		<input type="number" id="cost" name="cost" placeholder="Ключ" class="form-control" required>
+		<textarea class="form-control" id="output" readonly></textarea>
+		<button class="btn btn-lg btn-primary btn-block" id="encrypt">Encrypt</button>
+		<button class="btn btn-lg btn-primary btn-block" id="decrypt">Decrypt</button>
+		<hr>
+		<input type="email" name="email" placeholder="Email" class="form-control" required>
+		<button class="btn btn-lg btn-primary btn-block" type="submit">Send to email</button>
+	</form>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  	$('#encrypt').on('click', function(event){
+      event.preventDefault()
+	  $('#output').val(encrypt($('#password').val(), parseInt($('#cost').val())))
+    })
+
+    $('#decrypt').on('click', function(event){
+      event.preventDefault()
+      $('#output').val(decrypt($('#password').val(), parseInt($('#cost').val())))
+    })
+
+  var alphabet = 'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ';
+  var shiftAlphabet = function (shift) {
+    var shiftedAlphabet = ''; //новий алфавіт
+    for (var i = 0; i < alphabet.length; i++) {
+      currentLetter = (alphabet[i + shift] === undefined) ? (alphabet[i + shift - alphabet.length]) : (alphabet[i + shift]);          shiftedAlphabet = shiftedAlphabet.concat(currentLetter);
+    }
+    return shiftedAlphabet;
+  }
+
+  var encrypt = function (message, shift) {
+    var shiftedAlphabet = shiftAlphabet(shift);
+    var encryptedMessage = '';
+    for (var i = 0; i < message.length; i++) {
+      var indexOfLetter = alphabet.indexOf(message[i].toUpperCase());
+      encryptedMessage = encryptedMessage.concat(shiftedAlphabet[indexOfLetter]);
+    }
+    return encryptedMessage
+  }
+
+  var decrypt = function (message, shift) {
+    var shiftedAlphabet = shiftAlphabet(shift);
+    var encryptedMessage = '';
+    for (var i = 0; i < message.length; i++) {
+      if (message[i] == ' ') {
+        encryptedMessage = encryptedMessage.concat(' ');
+        continue};
+      var indexOfLetter = shiftedAlphabet.indexOf(message[i].toUpperCase());
+      encryptedMessage = encryptedMessage.concat(alphabet[indexOfLetter]);
+    }
+    return encryptedMessage;
+  }
+
+</script>
+{% endblock %}
